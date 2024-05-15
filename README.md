@@ -15,12 +15,15 @@
 
 # Ethereum Price Ticker
 
+*Note: It is worth knowing, coin gecko seems a little slow to update the price, don't spam your refresh button over 
+and over. I would give it at least a min. before refreshing*
+
 A simple app using TKinter as a class to show the current price of ethereum.
 
 ## Features
 
 - Small window/widget easy to place anywhere on your screen without taking up too much space.
-- Refresh button to ensure you always have the most recent price data.
+- Refresh button to ensure you always have the most recent price data without wasting all your free api calls
 - Color of price text updates so you know it refreshed even if price did not change.
 
 ## API key
