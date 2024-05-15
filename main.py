@@ -1,3 +1,5 @@
+import random
+
 import requests
 from dotenv import load_dotenv
 import os
@@ -36,23 +38,28 @@ parameters_data = {
     'sparkline': 'false'
 }
 
-
-call = requests.get(CG_URL_coin_data, headers=headers, params=parameters_data)
-call.raise_for_status()
-x = call.json()
-
-pprint.pp(x['market_data']['current_price']['usd'])
+TEXT_COLORS = [
+    "#ff6eff", "#ff4d4d", "#ffaa1d", "#39ff14", "#15f4ee",
+    "#ff00ff", "#00ffff", "#ffff00", "#00ff00", "#ff0000"
+]
 
 class CryptoWidget:
 
     def __init__(self):
         self.window = Tk()
         self.window.title('Eth Ticker +')
-        self.window.config(bg='black', pady=30, padx=30)
+        self.window.config(bg='black', pady=20, padx=20)
+
+        self.info_label = Label(text='Ethereum Price: ', fg='orange', bg='black', font=('Arial', 14, 'italic'))
+        self.info_label.grid(row=0, column=0, pady=5)
+
+        refresh_img = PhotoImage(file='refresh.png')
+        self.refresh_button = Button(image=refresh_img, highlightthickness=0, borderwidth=0, bg='grey', fg='orange', command=self.update_price)
+        self.refresh_button.grid(row=0, column=2, pady=10)
 
         self.display = Canvas(height=150, width=400, bg='black')
-        self.price_text = self.display.create_text(200, 75, text='This is text', fill='orange', font=('Arial', 16, 'bold'), width=130)
-        self.display.grid(row=0, column=0)
+        self.price_text = self.display.create_text(200, 75, text='This is text', fill='orange', font=('Arial', 16, 'italic'), width=130)
+        self.display.grid(row=1, column=0, columnspan=3)
 
 
 
@@ -60,7 +67,15 @@ class CryptoWidget:
 
         self.window.mainloop()
 
+    def change_price(self):
+        call = requests.get(CG_URL_single_coin, headers=headers, params=parameters_single)
+        call.raise_for_status()
+        data = call.json()
+        price = data['ethereum']['usd']
+        self.display.itemconfig(self.price_text, text=f'{price}', fill=random.choice(TEXT_COLORS))
+        print(data)
 
-
+    def update_price(self):
+        self.window.after(1000, self.change_price())
 
 CryptoWidget()
