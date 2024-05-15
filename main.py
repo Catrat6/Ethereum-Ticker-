@@ -2,6 +2,7 @@ import requests
 from dotenv import load_dotenv
 import os
 import pprint
+from tkinter import *
 
 load_dotenv()
 
@@ -42,6 +43,24 @@ x = call.json()
 
 pprint.pp(x['market_data']['current_price']['usd'])
 
+class CryptoWidget:
+
+    def __init__(self):
+        self.window = Tk()
+        self.window.title('Eth Ticker +')
+        self.window.config(bg='black', pady=30, padx=30)
+
+        self.display = Canvas(height=150, width=400, bg='black')
+        self.price_text = self.display.create_text(200, 75, text='This is text', fill='orange', font=('Arial', 16, 'bold'), width=130)
+        self.display.grid(row=0, column=0)
 
 
 
+
+
+        self.window.mainloop()
+
+
+
+
+CryptoWidget()
