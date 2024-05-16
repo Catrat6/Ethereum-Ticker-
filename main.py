@@ -1,14 +1,13 @@
 import random
-
 import requests
 from dotenv import load_dotenv
 import os
-import pprint
 from tkinter import *
+from tkinter import simpledialog
 
 load_dotenv()
 
-CG_KEY = os.getenv('coin_gecko_api_key')
+CG_KEY = os.getenv('COIN_GECKO_API_KEY')
 
 path_coin = 'ethereum'
 
@@ -43,7 +42,57 @@ TEXT_COLORS = [
     "#ff00ff", "#00ffff", "#ffff00", "#00ff00", "#ff0000"
 ]
 
-class CryptoWidget:
+class KeyEntry(simpledialog.Dialog):
+
+    def __init__(self, parent, title=None):
+        self.result = None
+        super().__init__(parent, title)
+
+    def buttonbox(self):
+        pass
+
+    def body(self, master):
+
+        master.configure(bg='black', highlightthickness=0, padx=30, pady=30)
+
+        self.enter_label = Label(master, text='Enter Your API key for CoinGecko', bg='black', fg='orange', font=('Arial', 16, 'bold'))
+        self.enter_sub_label = Label(master, text='- If a key has already been stored close the window\n'
+                                                  '- To overwrite a key simply enter a new one\n'
+                                                  '- Click "Enter Key" with an empty field to show your current key\n'
+                                                  '- Make sure the field is clear before entering a new key', bg='black', fg='orange', font=('Arial', 11, 'italic'))
+        self.enter_label.grid(column=0, row=0, pady=(10, 0), padx=10)
+        self.enter_sub_label.grid(column=0, row=1, pady=(0, 10))
+
+        self.enter_key = Entry(master, width=42, bg='orange', fg='black', font=('Arial', 14, 'italic'))
+        self.enter_key.grid(column=0, row=3)
+
+        self.enter_key_button = Button(master, text='Enter Key', bg='grey', fg='black', font=('Arial', 14, 'bold'), command=self.write_key_to_env)
+        self.enter_key_button.grid(column=1, row=3, padx=(5, 0))
+
+    def write_key_to_env(self):
+        x = self.enter_key.get()
+
+        if len(x) == 0:
+            with open('.env', 'r') as file:
+                x = file.read()
+                x = x[21:]
+                self.enter_key.config(bg='Yellow')
+                self.enter_key.insert(0, f'Current Key: {x}')
+
+        else:
+            with open('.env', 'w') as file:
+                file.write(f'COIN_GECKO_API_KEY = {x}')
+
+            self.enter_key.delete(0, 'end')
+            self.enter_key.config(bg='Green')
+            self.enter_key.insert(0, 'Your Key Has Been Entered')
+
+
+
+
+
+
+class CryptoWidget():
 
     def __init__(self):
         self.window = Tk()
@@ -61,7 +110,12 @@ class CryptoWidget:
         self.price_text = self.display.create_text(200, 75, text='Refresh for Price', fill='orange', font=('Arial', 16, 'bold'), width=380)
         self.display.grid(row=1, column=0, columnspan=3)
 
+        self.open_key_entry()
+
         self.window.mainloop()
+
+    def open_key_entry(self):
+        popup_key_entry = KeyEntry(self.window, 'Key Entry')
 
     def change_price(self):
         call = requests.get(CG_URL_single_coin, headers=headers, params=parameters_single)
